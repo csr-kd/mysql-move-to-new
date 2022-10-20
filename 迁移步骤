@@ -1,0 +1,26 @@
+1.停服
+全量停止脚本：
+停服后数据库执行：alter user user@'%' account lock;
+
+2. 主库 导出 待迁移数据库
+语句：mysqldump --single-transaction --quick --set-gtid-purged=OFF --routines -udump_user -p"***" database | gzip > /backup/mysqldump/database_`date "+%Y%m%d"`.sql.gz
+mysqldump --single-transaction --quick --set-gtid-purged=OFF --routines -udump_user -p"***" database | gzip > /backup/mysqldump/database_`date "+%Y%m%d"`.sql.gz
+
+3. 新库 导入 数据库
+scp database_`date "+%Y%m%d"`.sql.gz root@10.0.0.1:/backup/mysqldump/
+gzip -d database_`date "+%Y%m%d"`.sql.gz
+
+语句：mysql -u root -p database < database_`date "+%Y%m%d"`.sql
+mysql -u root -p database < database_`date "+%Y%m%d"`.sql
+
+授权：
+GRANT EXECUTE ON FUNCTION `database`.`de_aes` TO 'select_user'@'%';
+...
+
+4.重启应用服务
+全量启动脚本：
+
+5.数据验证
+
+6. 新库定时任务加上备份数据库，以及备库磁盘初始化
+
